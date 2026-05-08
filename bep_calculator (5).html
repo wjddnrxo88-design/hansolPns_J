@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>구내식당 운영 비용 비교 계산기</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f4f5f7;color:#1a1a1a;min-height:100vh;}
+.header{background:#1a1a1a;color:#fff;padding:1.25rem 2rem;}
+.header h1{font-size:20px;font-weight:700;}
+.container{max-width:1100px;margin:0 auto;padding:1.5rem;}
+.stitle{font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.625rem;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.75rem;}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:.875rem 1rem;}
+.ir{display:flex;flex-direction:column;gap:4px;margin-bottom:.625rem;}
+.ir:last-child{margin-bottom:0;}
+.ir label{font-size:12px;font-weight:700;color:#374151;}
+.ir .d{font-size:11px;color:#9ca3af;}
+.ir input{width:100%;font-size:14px;padding:7px 10px;border:1px solid #d1d5db;border-radius:6px;outline:none;}
+.ir input:focus{border-color:#6366f1;}
+.ir .tip{font-size:11px;color:#2563eb;margin-top:3px;font-weight:500;}
+.irow{display:grid;grid-template-columns:140px 1fr 120px;align-items:center;gap:.5rem;padding:9px 0;border-bottom:1px solid #f3f4f6;}
+.irow:last-child{border-bottom:none;}
+.irow label{font-size:12px;font-weight:700;color:#374151;}
+.inp{display:flex;align-items:center;gap:5px;}
+.inp input{font-size:14px;padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;outline:none;transition:border .15s;}
+.inp input:focus{border-color:#6366f1;}
+.inp span{font-size:11px;color:#9ca3af;white-space:nowrap;}
+.tot{font-size:12px;font-weight:700;text-align:right;color:#374151;}
+.metric{background:#f9fafb;border-radius:8px;padding:.625rem .875rem;border:1px solid #f3f4f6;}
+.ml{font-size:11px;color:#6b7280;margin-bottom:4px;line-height:1.4;}
+.mv{font-size:16px;font-weight:700;}
+.mv.red{color:#dc2626;}.mv.green{color:#16a34a;}.mv.amber{color:#d97706;}.mv.blue{color:#2563eb;}
+.divider{border:none;border-top:1px solid #e5e7eb;margin:1.25rem 0;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:#f9fafb;padding:8px 10px;text-align:center;font-weight:700;color:#6b7280;border:1px solid #e5e7eb;font-size:11px;}
+td{padding:8px 10px;text-align:center;border:1px solid #e5e7eb;color:#374151;}
+td.lc{text-align:left;font-weight:700;color:#6b7280;background:#f9fafb;}
+td.red{color:#dc2626;font-weight:700;}td.green{color:#16a34a;font-weight:700;}
+td.blue{color:#2563eb;font-weight:700;}td.amber{color:#d97706;font-weight:700;}
+.tab-wrap{display:flex;gap:8px;margin-bottom:1.25rem;}
+.tab{padding:8px 20px;border-radius:8px;border:1px solid #e5e7eb;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:#6b7280;transition:all .15s;}
+.tab:hover{border-color:#6366f1;color:#6366f1;}
+.tab.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+.note{font-size:11px;color:#9ca3af;}
+.mc{font-size:11px;color:#2563eb;margin-top:3px;font-weight:700;}
+.gbox{background:#f8fafc;border-left:3px solid #cbd5e1;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:1rem;}
+.gbox p{font-size:12px;color:#64748b;line-height:1.8;margin:0;}
+.gbox strong{color:#1e293b;font-weight:700;}
+.flow{display:flex;align-items:center;gap:6px;margin-bottom:.875rem;flex-wrap:wrap;}
+.fi{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-size:11px;text-align:center;min-width:82px;}
+.fi .fl{font-size:10px;color:#9ca3af;margin-bottom:2px;}
+.fi .fv{font-size:13px;font-weight:700;}
+.aw{font-size:16px;color:#9ca3af;}
+.ps{display:flex;border-radius:10px;overflow:hidden;border:1px solid #e5e7eb;margin-bottom:4px;}
+.ps>div{flex:1;padding:9px;text-align:center;}
+.ps .pl{font-size:10px;margin-bottom:2px;}
+.ps .pv{font-size:14px;font-weight:700;}
+.pwarn{font-size:11px;color:#d97706;display:none;margin-top:4px;}
+.lsum{background:#f9fafb;border-radius:8px;padding:8px 12px;margin-top:8px;font-size:12px;display:flex;gap:1.5rem;flex-wrap:wrap;border:1px solid #f3f4f6;}
+.lsum span{color:#6b7280;}.lsum strong{color:#1a1a1a;}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.blbl{font-size:11px;width:72px;text-align:right;flex-shrink:0;}
+.btrack{flex:1;height:24px;background:#f9fafb;border-radius:6px;border:1px solid #e5e7eb;position:relative;}
+.bfill{height:100%;border-radius:6px 0 0 6px;position:absolute;left:0;top:0;}
+.bnum{position:absolute;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;white-space:nowrap;}
+.bwrap{background:#f9fafb;border-radius:8px;padding:.875rem;margin-bottom:.625rem;border:1px solid #f3f4f6;}
+.clbl{font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid #e5e7eb;}
+.section{margin-bottom:1.5rem;}
+
+/* 사용 설명서 */
+.manual{background:#fff;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:1.5rem;overflow:hidden;}
+.manual-header{padding:.875rem 1rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;}
+.manual-header:hover{background:#f9fafb;}
+.manual-title{font-size:13px;font-weight:700;color:#374151;}
+.manual-badge{font-size:11px;background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:10px;font-weight:600;}
+.manual-arrow{font-size:14px;color:#9ca3af;transition:transform .2s;}
+.manual-arrow.open{transform:rotate(180deg);}
+.manual-body{display:none;padding:0 1rem 1rem;}
+.manual-body.open{display:block;}
+.manual-step{display:flex;gap:.75rem;margin-bottom:.875rem;}
+.step-num{width:24px;height:24px;border-radius:50%;background:#1a1a1a;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-content .step-title{font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:3px;}
+.step-content .step-desc{font-size:12px;color:#6b7280;line-height:1.7;}
+.step-content .step-desc b{color:#374151;}
+.manual-term-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.75rem;}
+.term-item{background:#f9fafb;border-radius:8px;padding:10px 12px;}
+.term-name{font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:3px;}
+.term-desc{font-size:11px;color:#6b7280;line-height:1.5;}
+
+@media(max-width:768px){.g4{grid-template-columns:1fr 1fr;}.g3{grid-template-columns:1fr;}.g2{grid-template-columns:1fr;}.irow{grid-template-columns:1fr;}.manual-term-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>구내식당 운영 비용 비교 계산기</h1>
+</div>
+<div class="container">
+
+<!-- 사용 설명서 -->
+<div class="manual">
+  <div class="manual-header" onclick="toggleManual()">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="manual-title">📋 사용 설명서</span>
+      <span class="manual-badge">처음이시면 먼저 읽어보세요</span>
+    </div>
+    <span class="manual-arrow" id="manual-arrow">▼</span>
+  </div>
+  <div class="manual-body" id="manual-body">
+    <div style="margin-bottom:1rem;">
+      <p style="font-size:12px;color:#6b7280;line-height:1.8;">이 계산기는 <b style="color:#1a1a1a">직영</b>과 <b style="color:#1a1a1a">위탁</b> 두 가지 구내식당 운영 방식에서 <b style="color:#1a1a1a">회사가 실제로 얼마를 부담하는지</b>를 계산합니다.<br>숫자를 바꾸면 결과가 즉시 반영됩니다.</p>
+    </div>
+    <div class="manual-step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">공통 조건 입력</div>
+        <div class="step-desc">먼저 <b>일 식수, 월 영업일, 임대료, 판매 단가</b>를 입력합니다. 이 숫자는 직영·위탁 모두에 적용됩니다.</div>
+      </div>
+    </div>
+    <div class="manual-step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">1식 단가 구성 입력</div>
+        <div class="step-desc"><b>직원 부담</b>(직원이 내는 금액)과 <b>회사 식단 보조</b>(회사가 추가로 지원하는 금액)를 입력합니다. 두 합계가 판매 단가와 같아야 합니다.</div>
+      </div>
+    </div>
+    <div class="manual-step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">공통 비용 입력</div>
+        <div class="step-desc"><b>수도광열비</b>(가스·전기·수도)와 <b>위생·운영비</b>를 입력합니다. 직영·위탁 모두 공간을 임차하면 발생하는 비용입니다.</div>
+      </div>
+    </div>
+    <div class="manual-step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <div class="step-title">직영 탭 — 인건비·식재료비 입력</div>
+        <div class="step-desc"><b>영양사·조리원 인원수와 급여</b>를 직접 입력합니다. 식재료비는 <b>원가율(%)</b>을 입력하면 자동 계산됩니다.</div>
+      </div>
+    </div>
+    <div class="manual-step" style="margin-bottom:0;">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <div class="step-title">위탁 탭 — 업체 단가 입력</div>
+        <div class="step-desc"><b>업체가 제시한 단가</b>를 직접 입력합니다. 업체 단가 안에 인건비·식재료비·운영비·업체 이익이 모두 포함되어 있습니다.</div>
+      </div>
+    </div>
+    <div class="divider" style="margin:.875rem 0;"></div>
+    <p style="font-size:12px;font-weight:700;color:#374151;margin-bottom:.625rem;">주요 용어</p>
+    <div class="manual-term-grid">
+      <div class="term-item"><div class="term-name">판매 단가</div><div class="term-desc">식당에서 파는 한 끼 가격. 직원 부담 + 회사 보조의 합계.</div></div>
+      <div class="term-item"><div class="term-name">회사 식단 보조</div><div class="term-desc">회사가 1식당 추가로 지원하는 금액. 직원 부담을 낮추기 위해 책정.</div></div>
+      <div class="term-item"><div class="term-name">식재료비율</div><div class="term-desc">판매 단가 대비 식재료 원가 비율. 50% 입력 시 10,000원 × 50% = 5,000원/식.</div></div>
+      <div class="term-item"><div class="term-name">업체 단가</div><div class="term-desc">위탁업체가 1식당 청구하는 금액. 인건비·식재료·운영비·업체 이익 포함.</div></div>
+      <div class="term-item"><div class="term-name">회사 월 순 부담</div><div class="term-desc">월 총 지출에서 직원 납입액을 뺀 금액. 회사가 실제로 매월 쓰는 돈.</div></div>
+      <div class="term-item"><div class="term-name">운영 적자 0 식수</div><div class="term-desc">직영에서 회사 보조금 없이 직원 납입액만으로 운영비를 충당하는 최소 식수.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 조건 -->
+<div class="section">
+<div class="stitle">① 공통 조건 — 직영·위탁 모두 동일하게 적용</div>
+<div class="g4" style="margin-bottom:.875rem;">
+  <div class="card"><div class="ir"><label>일 식수 (식/일)</label><span class="d">하루에 판매하는 식사 수</span><input type="number" id="daily" value="150"></div></div>
+  <div class="card"><div class="ir"><label>월 영업일 (일)</label><span class="d">한 달 운영 일수</span><input type="number" id="wdays" value="22"></div><p class="mc" id="mc">→ 월 식수: 3,300식</p></div>
+  <div class="card"><div class="ir"><label>월 임대료 (만원)</label><span class="d">식당 공간 임대 비용</span><input type="number" id="rent" value="500"></div></div>
+  <div class="card"><div class="ir"><label>판매 단가 (원/식)</label><span class="d">직원에게 파는 한 끼 가격</span><input type="number" id="sell" value="10000"></div></div>
+</div>
+
+<!-- 1식 단가 구성 -->
+<div class="stitle">② 1식 단가 구성 — 직원 부담 + 회사 보조 = 판매 단가</div>
+<div class="card" style="border-color:#bfdbfe;margin-bottom:.875rem;">
+  <div class="g3">
+    <div class="ir"><label>직원 부담 (원/식)</label><span class="d">직원이 실제로 내는 금액 (급여 공제)</span><input type="number" id="emp_pay" value="7000"></div>
+    <div class="ir"><label>회사 식단 보조 (원/식)</label><span class="d">회사가 1식당 추가로 지원하는 금액</span><input type="number" id="comp_sub" value="3000"></div>
+    <div>
+      <div class="ps">
+        <div style="background:#f0fdf4;"><div class="pl" style="color:#16a34a">직원 부담</div><div class="pv" style="color:#16a34a" id="ps_e">-</div></div>
+        <div style="background:#eff6ff;"><div class="pl" style="color:#2563eb">회사 보조</div><div class="pv" style="color:#2563eb" id="ps_s">-</div></div>
+        <div style="background:#f9fafb;"><div class="pl" style="color:#6b7280">합계</div><div class="pv" id="ps_t">-</div></div>
+      </div>
+      <p class="pwarn" id="pw"></p>
+    </div>
+  </div>
+</div>
+
+<!-- 공통 비용 -->
+<div class="stitle">③ 공통 비용 — 공간 임차 시 직영·위탁 모두 발생</div>
+<div class="card" style="border-color:#d1fae5;">
+  <div class="g2">
+    <div class="ir"><label>수도광열비 (만원/월)</label><span class="d">가스·전기·수도 합산 (준고정비)</span><input type="number" id="c_util" value="120"></div>
+    <div class="ir"><label>위생·운영비 (만원/월)</label><span class="d">위생용품·소모품·방역·설비유지 등</span><input type="number" id="c_ops" value="80"></div>
+  </div>
+</div>
+</div>
+
+<div class="divider"></div>
+<div class="tab-wrap">
+  <button class="tab active" onclick="showTab('d')">직영</button>
+  <button class="tab" onclick="showTab('o')">위탁</button>
+  <button class="tab" onclick="showTab('c')">두 모델 비교</button>
+</div>
+
+<!-- 직영 -->
+<div id="tab-d">
+<div class="gbox"><p>직영은 회사가 인력을 직접 채용해 운영합니다.<br>
+<b>회사 부담</b> = 인건비 + 식재료비 + 공통 비용 − 직원 납입액<br>
+식수가 늘수록 고정비(인건비)가 분산되어 1식당 회사 부담이 줄어듭니다.</p></div>
+
+<div class="stitle">④ 인건비 — 직영에서만 발생</div>
+<div class="gbox" style="margin-bottom:.75rem;"><p>
+<b>영양사 1명 의무</b> (식품위생법 제52조) — 조리사 자격증 보유 시 조리사 겸직 가능<br>
+<b>조리원</b>: 인원수를 직접 입력하세요. 통상 일 식수 50식당 1명 기준으로 산정합니다.
+</p></div>
+<div class="card" style="margin-bottom:.875rem;">
+  <div class="irow">
+    <label>영양사</label>
+    <div class="inp">
+      <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:#fef3c7;color:#d97706;font-weight:700;">법적 의무</span>
+      <input type="number" id="cnt_nurse" value="1" style="width:50px">
+      <span>명</span>
+      <input type="number" id="sal_nurse" value="300" style="width:75px">
+      <span>만원/인</span>
+    </div>
+    <span class="tot" id="tot_nurse">300만원</span>
+  </div>
+  <div class="irow">
+    <label>조리원</label>
+    <div class="inp">
+      <input type="number" id="cnt_cook" value="3" style="width:50px">
+      <span>명</span>
+      <input type="number" id="sal_cook" value="230" style="width:75px">
+      <span>만원/인</span>
+    </div>
+    <span class="tot" id="tot_cook">690만원</span>
+  </div>
+  <div class="lsum" id="labor_sum"><span>인건비 합계 <strong id="total_labor" style="color:#dc2626">-</strong></span><span style="color:#9ca3af;font-size:11px;">💡 조리원: 일 식수 50식당 1명 기준 (예: 150식 → 3명)</span></div>
+</div>
+
+<div class="stitle">⑤ 식재료비</div>
+<div class="card" style="margin-bottom:.875rem;">
+  <div class="g2">
+    <div class="ir">
+      <label>식재료비율 (%)</label>
+      <span class="d">판매 단가 대비 식재료 원가 비율</span>
+      <input type="number" id="d_food_rate" value="50">
+      <span class="tip">예: 50% → 판매단가 10,000원 × 50% = 5,000원/식</span>
+    </div>
+    <div class="ir">
+      <label>식재료비 (원/식) ← 자동 계산</label>
+      <span class="d">직접 수정도 가능 (수정 시 비율 자동 역산)</span>
+      <input type="number" id="d_food" value="5000">
+    </div>
+  </div>
+</div>
+
+<div class="stitle">수입 / 지출 / 회사 부담</div>
+<div class="stitle" style="margin-top:.5rem">① 수입</div><div class="flow" id="d_in"></div>
+<div class="stitle">② 지출</div><div class="flow" id="d_out"></div>
+<div class="stitle">③ 회사 실제 부담 = 지출 − 수입</div><div class="flow" id="d_res"></div>
+
+<div class="g3" style="gap:8px;margin-bottom:.875rem;">
+  <div class="metric"><div class="ml">직원 납입 (월)</div><div class="mv green" id="d_em">-</div></div>
+  <div class="metric"><div class="ml">회사 보조 (월)</div><div class="mv blue" id="d_sm">-</div></div>
+  <div class="metric"><div class="ml">운영 적자 (월)</div><div class="mv red" id="d_def">-</div></div>
+</div>
+<div class="g2" style="gap:8px;margin-bottom:1.25rem;">
+  <div class="metric"><div class="ml">회사 월 총 부담 (보조 + 운영 적자)</div><div class="mv red" id="d_burden">-</div></div>
+  <div class="metric"><div class="ml">회사 연간 총 부담</div><div class="mv red" id="d_burden_y">-</div></div>
+</div>
+
+<div class="card" style="margin-bottom:1.25rem;">
+  <p style="font-size:13px;font-weight:700;margin-bottom:.75rem;">운영 적자가 0이 되려면?</p>
+  <div class="g2" style="gap:8px;margin-bottom:.75rem;">
+    <div class="metric"><div class="ml">최소 일 식수<br>이 이상 팔면 운영 적자 ±0</div><div class="mv amber" id="d_bep_d">-</div></div>
+    <div class="metric"><div class="ml">최소 판매 단가<br>현재 식수 유지 시 ±0 되려면</div><div class="mv amber" id="d_bep_p">-</div></div>
+  </div>
+  <p class="note" id="d_bep_msg" style="margin-bottom:.875rem;"></p>
+  <div class="bwrap" id="d_bars"></div>
+  <p class="note">파란 ◀ = 현재 식수 &nbsp;|&nbsp; 빨간 = 적자 &nbsp;|&nbsp; 초록 = 흑자</p>
+</div>
+
+<div class="divider"></div>
+<div class="stitle">직원 부담별 시나리오</div>
+<p class="note" style="margin-bottom:8px;">직원 부담을 바꿨을 때 회사 부담이 어떻게 달라지는지 보여줍니다. 노란 행 = 현재 입력 기준</p>
+<table><thead><tr><th>직원 부담</th><th>회사 보조/식</th><th>직원 납입(월)</th><th>회사 보조(월)</th><th>운영 적자(월)</th><th>회사 총 부담(월)</th></tr></thead><tbody id="d_tbl"></tbody></table>
+</div>
+
+<!-- 위탁 -->
+<div id="tab-o" style="display:none">
+<div class="gbox"><p>위탁은 전문 업체가 인력·식재료·조리·배식 전 과정을 담당합니다.<br>
+<b>회사 부담</b> = 업체 지급액 + 공통 비용 − 직원 납입액<br>
+월말 식수 × 업체단가를 세금계산서로 일괄 정산합니다. 업체단가 안에 식재료비·인건비·운영비·업체 이익이 포함됩니다.</p></div>
+
+<div class="stitle">④ 업체 단가 입력 — 3가지 시나리오</div>
+<div class="card" style="margin-bottom:.875rem;">
+  <p class="note" style="margin-bottom:.75rem;">업체가 제시한 단가를 직접 입력하세요. 단가가 바뀌면 손익이 즉시 계산됩니다.</p>
+  <div class="irow">
+    <label>업체 단가 1</label>
+    <div class="inp"><input type="number" id="o1" value="10000" style="width:100px"><span>원/식</span></div>
+    <span class="tot red" id="o1_m">-</span>
+  </div>
+  <div class="irow">
+    <label>업체 단가 2</label>
+    <div class="inp"><input type="number" id="o2" value="12500" style="width:100px"><span>원/식</span></div>
+    <span class="tot red" id="o2_m">-</span>
+  </div>
+  <div class="irow">
+    <label>업체 단가 3</label>
+    <div class="inp"><input type="number" id="o3" value="15000" style="width:100px"><span>원/식</span></div>
+    <span class="tot red" id="o3_m">-</span>
+  </div>
+  <p class="note" style="margin-top:8px;">우측 = 해당 단가 기준 월 업체 지급액</p>
+</div>
+
+<div class="stitle">업체 단가 1 기준 상세 분석</div>
+<div class="stitle" style="margin-top:.5rem">① 수입</div><div class="flow" id="o_in"></div>
+<div class="stitle">② 지출 (월말 세금계산서 일괄 정산)</div><div class="flow" id="o_out"></div>
+<div class="stitle">③ 회사 손익 = 수입 − 지출</div><div class="flow" id="o_res"></div>
+
+<div class="g3" style="gap:8px;margin-bottom:.875rem;">
+  <div class="metric"><div class="ml">직원 납입 (월)</div><div class="mv green" id="o_em">-</div></div>
+  <div class="metric"><div class="ml">회사 보조 (월)</div><div class="mv blue" id="o_sm">-</div></div>
+  <div class="metric"><div class="ml">월 손익</div><div class="mv" id="o_net_v">-</div></div>
+</div>
+<div class="g2" style="gap:8px;margin-bottom:1.25rem;">
+  <div class="metric"><div class="ml">회사 월 부담 또는 수익</div><div class="mv" id="o_burden">-</div></div>
+  <div class="metric"><div class="ml">연간</div><div class="mv" id="o_burden_y">-</div></div>
+</div>
+
+<div class="card" style="margin-bottom:1.25rem;">
+  <p style="font-size:13px;font-weight:700;margin-bottom:.625rem;">식수별 월 손익 (업체 단가 1 기준)</p>
+  <div class="bwrap" id="o_bars"></div>
+  <p class="note" id="o_bars_note"></p>
+</div>
+
+<div class="divider"></div>
+<div class="stitle">업체 단가별 비교</div>
+<table><thead><tr><th>업체 단가</th><th>월 지급액</th><th>1식당 손익</th><th>회사 월 부담</th><th>연간 부담</th></tr></thead><tbody id="o_tbl"></tbody></table>
+</div>
+
+<!-- 비교 -->
+<div id="tab-c" style="display:none">
+<div class="gbox"><p>직영 탭과 위탁 탭에서 입력한 숫자가 그대로 반영됩니다. 별도 입력 불필요.</p></div>
+<div class="g2" style="gap:1.25rem;margin-bottom:1.5rem;">
+  <div>
+    <p class="clbl">직영 (직영 탭 입력 기준)</p>
+    <div class="stitle">수입</div><div class="flow" id="c_d_in"></div>
+    <div class="stitle">지출</div><div class="flow" id="c_d_out"></div>
+    <div class="stitle">회사 부담</div><div class="flow" id="c_d_res"></div>
+    <div class="g2" style="gap:6px;margin-top:.5rem;">
+      <div class="metric"><div class="ml">회사 월 총 부담</div><div class="mv red" id="c_d_b">-</div></div>
+      <div class="metric"><div class="ml">연간</div><div class="mv red" id="c_d_by">-</div></div>
+    </div>
+  </div>
+  <div>
+    <p class="clbl">위탁 (업체 단가 1 기준)</p>
+    <div class="stitle">수입</div><div class="flow" id="c_o_in"></div>
+    <div class="stitle">지출</div><div class="flow" id="c_o_out"></div>
+    <div class="stitle">회사 손익</div><div class="flow" id="c_o_res"></div>
+    <div class="g2" style="gap:6px;margin-top:.5rem;">
+      <div class="metric"><div class="ml">회사 월 부담/수익</div><div class="mv" id="c_o_b">-</div></div>
+      <div class="metric"><div class="ml">연간</div><div class="mv" id="c_o_by">-</div></div>
+    </div>
+  </div>
+</div>
+<div class="divider"></div>
+<div class="stitle">구조적 차이</div>
+<table><thead><tr><th style="text-align:left;">항목</th><th>직영</th><th>위탁</th></tr></thead>
+<tbody>
+  <tr><td class="lc">인건비</td><td id="cl">-</td><td>업체 단가에 포함 (업체 부담)</td></tr>
+  <tr><td class="lc">식재료비</td><td id="cf">-</td><td>업체 단가에 포함 (업체 부담)</td></tr>
+  <tr><td class="lc">수도광열비</td><td id="cu">-</td><td id="cu_o">-</td></tr>
+  <tr><td class="lc">위생·운영비</td><td id="co">-</td><td id="co_o">-</td></tr>
+  <tr><td class="lc">정산 방식</td><td>각 항목 직접 지출</td><td>식수 × 업체단가 월말 세금계산서</td></tr>
+  <tr><td class="lc">식품사고 책임</td><td>회사 직접</td><td>업체 부담</td></tr>
+  <tr><td class="lc">퀄리티 통제</td><td>직접 가능</td><td>업체 재량</td></tr>
+</tbody></table>
+</div>
+</div>
+
+<script>
+function fmt(n){return Math.round(n).toLocaleString()+'만원';}
+function fmtW(n){return Math.round(n).toLocaleString()+'원';}
+function fmtN(n){return Math.round(n).toLocaleString();}
+function v(id){return parseFloat(document.getElementById(id).value)||0;}
+var CI='#16a34a',CO='#dc2626',CS='#2563eb';
+function fi(c,l,val){return '<div class="fi"><div class="fl">'+l+'</div><div class="fv" style="color:'+c+'">'+val+'</div></div>';}
+function fib(l,val,bc,fc){return '<div class="fi" style="border:2px solid '+bc+'"><div class="fl">'+l+'</div><div class="fv" style="color:'+(fc||'#1a1a1a')+'">'+val+'</div></div>';}
+function aw(){return '<span class="aw">+</span>';}
+function mn(){return '<span class="aw">−</span>';}
+function eq(){return '<span class="aw">=</span>';}
+
+function buildBars(daily,wd,es,df,fx){
+  var dl=[50,100,150,200,250,300,400];
+  if(dl.indexOf(daily)<0)dl.push(daily);
+  dl.sort(function(a,b){return a-b;});
+  var diffs=dl.map(function(d){var m=d*wd;return Math.round(es*m/10000)-(fx+Math.round(df*m/10000));});
+  var mx=Math.max.apply(null,diffs.map(function(x){return Math.abs(x);}));if(!mx)mx=1;
+  var h='';
+  dl.forEach(function(d,i){
+    var diff=diffs[i],iC=d===daily,ip=diff>=0;
+    var pct=Math.round(Math.abs(diff)/mx*78);
+    var fc=iC?'#bfdbfe':ip?'#bbf7d0':'#fecaca';
+    var tc=iC?'#1d4ed8':ip?'#15803d':'#dc2626';
+    h+='<div class="bar-row"><div class="blbl" style="color:'+tc+';font-weight:'+(iC?700:400)+'">'+fmtN(d)+'식'+(iC?' ◀':'')+'</div>';
+    h+='<div class="btrack"><div class="bfill" style="width:'+pct+'%;background:'+fc+'"></div>';
+    h+='<div class="bnum" style="left:'+(pct+1)+'%;color:'+tc+'">'+(ip?'+':'▼')+fmt(Math.abs(diff))+'</div></div></div>';
+  });
+  return h;
+}
+
+function buildOBars(daily,wd,sell,op,fixedCost){
+  var perMeal=sell-op;
+  var bepD=perMeal>0?Math.ceil(fixedCost*10000/perMeal/wd):null;
+  var dl=[50,100,150,200,250,300,400];
+  if(dl.indexOf(daily)<0)dl.push(daily);
+  if(bepD&&dl.indexOf(bepD)<0)dl.push(bepD);
+  dl.sort(function(a,b){return a-b;});
+  var diffs=dl.map(function(d){
+    var m=d*wd;
+    return Math.round(sell*m/10000)-Math.round(op*m/10000)-fixedCost;
+  });
+  var mx=Math.max.apply(null,diffs.map(function(x){return Math.abs(x);}));if(!mx)mx=1;
+  var h='';
+  dl.forEach(function(d,i){
+    var diff=diffs[i],iC=d===daily,iB=bepD&&d===bepD,ip=diff>=0;
+    var pct=Math.round(Math.abs(diff)/mx*78);
+    var fc=iC?'#bfdbfe':iB?'#fde68a':ip?'#bbf7d0':'#fecaca';
+    var tc=iC?'#1d4ed8':iB?'#b45309':ip?'#15803d':'#dc2626';
+    h+='<div class="bar-row"><div class="blbl" style="color:'+tc+';font-weight:'+(iC||iB?700:400)+'">'+fmtN(d)+'식'+(iC?' ◀':'')+(iB?' BEP':'')+'</div>';
+    h+='<div class="btrack"><div class="bfill" style="width:'+pct+'%;background:'+fc+'"></div>';
+    h+='<div class="bnum" style="left:'+(pct+1)+'%;color:'+tc+'">'+(ip?'+':'▼')+fmt(Math.abs(diff))+'</div></div></div>';
+  });
+  return {html:h,bepD:bepD};
+}
+
+function calc(){
+  var daily=v('daily'),wd=v('wdays'),meals=daily*wd;
+  var sell=v('sell'),emp=v('emp_pay'),sub=v('comp_sub'),rent=v('rent');
+  var cUtil=v('c_util'),cOps=v('c_ops');
+  var cNurse=Math.max(1,Math.round(v('cnt_nurse'))),sNurse=v('sal_nurse');
+  var cCook=Math.max(0,Math.round(v('cnt_cook'))),sCook=v('sal_cook');
+  var dFood=v('d_food');
+  var o1=v('o1'),o2=v('o2'),o3=v('o3');
+
+  document.getElementById('mc').textContent='→ 월 식수: '+fmtN(meals)+'식';
+
+  // 인건비
+  var labor=cNurse*sNurse+cCook*sCook;
+  document.getElementById('tot_nurse').textContent=fmtN(cNurse*sNurse)+'만원 ('+cNurse+'명×'+fmtN(sNurse)+')';
+  document.getElementById('tot_cook').textContent=fmtN(cCook*sCook)+'만원 ('+cCook+'명×'+fmtN(sCook)+')';
+  document.getElementById('total_labor').textContent=fmtN(labor)+'만원';
+
+  // 단가 구성 표시
+  var psum=emp+sub;
+  document.getElementById('ps_e').textContent=fmtW(emp);
+  document.getElementById('ps_s').textContent=fmtW(sub);
+  document.getElementById('ps_t').textContent=fmtW(psum);
+  var pw=document.getElementById('pw');
+  if(psum!==sell){pw.style.display='block';pw.textContent='⚠ 직원 부담+회사 보조('+fmtW(psum)+')가 판매 단가('+fmtW(sell)+')와 다릅니다';}
+  else pw.style.display='none';
+
+  // ── 직영 계산 ──
+  var empM  = Math.round(emp*meals/10000);  // 직원 납입
+  var subM  = Math.round(sub*meals/10000);  // 회사 식단 보조
+  var totalIn = empM + subM;                // 식당 총 수입
+  var foodM = Math.round(dFood*meals/10000);
+  var totalOut = labor + foodM + rent + cUtil + cOps; // 식당 총 지출
+  var dDef    = Math.max(0, totalOut - totalIn);      // 운영 적자
+  var dBurden = subM + dDef;                          // 회사 실제 부담
+
+  // 직영 플로우
+  document.getElementById('d_in').innerHTML=
+    fi(CI,'직원 납입/월',fmt(empM))+aw()+
+    fi(CS,'회사 식단 보조',fmt(subM))+eq()+
+    fib('식당 총 수입',fmt(totalIn),'#86efac');
+  document.getElementById('d_out').innerHTML=
+    fi(CO,'인건비',fmt(labor))+aw()+fi(CO,'식재료비',fmt(foodM))+aw()+
+    fi(CO,'수도광열비',fmt(cUtil))+aw()+fi(CO,'위생·운영비',fmt(cOps))+aw()+
+    fi(CO,'임대료',fmt(rent))+eq()+
+    fib('식당 총 지출',fmt(totalOut),'#fca5a5');
+  document.getElementById('d_res').innerHTML=
+    fi(CS,'회사 식단 보조',fmt(subM))+aw()+
+    fi(CO,'운영 적자',fmt(dDef))+eq()+
+    fib('회사 월 총 부담',fmt(dBurden),'#fca5a5','#dc2626');
+
+  document.getElementById('d_em').textContent=fmt(empM);
+  document.getElementById('d_sm').textContent=fmt(subM);
+  document.getElementById('d_def').textContent=fmt(dDef);
+  document.getElementById('d_burden').textContent=fmt(dBurden);
+  document.getElementById('d_burden_y').textContent=fmt(dBurden*12);
+  document.getElementById('d_bars').innerHTML=buildBars(daily,wd,emp+sub,dFood,labor+rent+cUtil+cOps);
+
+  // BEP 계산
+  var ppm = (emp+sub) - dFood; // 1식당 공헌이익 (판매단가 - 식재료비)
+  var dFixedWon = (labor+rent+cUtil+cOps)*10000;
+  var bepMonthly = ppm>0 ? Math.ceil(dFixedWon/ppm) : null;
+  var bepDaily   = bepMonthly ? Math.ceil(bepMonthly/wd) : null;
+  var bepPrice   = Math.ceil((dFixedWon + dFood*meals)/meals);
+  document.getElementById('d_bep_d').textContent = bepDaily ? fmtN(bepDaily)+'식/일' : '달성 불가';
+  document.getElementById('d_bep_p').textContent = fmtW(bepPrice);
+  var gap = bepDaily ? bepDaily - daily : null;
+  document.getElementById('d_bep_msg').textContent = bepDaily
+    ? (gap>0 ? '현재 '+fmtN(daily)+'식 → BEP('+fmtN(bepDaily)+'식)까지 '+fmtN(gap)+'식 더 필요 / 또는 판매단가 '+fmtW(bepPrice)+' 이상이면 현재 식수로 ±0'
+             : '현재 식수로 운영 적자 없음')
+    : '식재료비가 판매단가보다 높아 식수를 늘려도 적자 증가';
+
+  // 직원 부담별 시나리오
+  var rows='';
+  [0,2000,3000,4000,5000,6000,7000,8000,9000,10000].filter(function(p){return p<=sell;}).forEach(function(ep){
+    var em=Math.round(ep*meals/10000);
+    var sm=Math.round(sub*meals/10000);
+    var ti=em+sm;
+    var od=Math.max(0,totalOut-ti);
+    var tb=sm+od;
+    rows+='<tr'+(ep===emp?' style="background:#fffbeb"':'')+'>';
+    rows+='<td>'+fmtW(ep)+'</td><td class="blue">'+fmtW(sub)+'</td>';
+    rows+='<td class="green">'+fmt(em)+'</td><td class="blue">'+fmt(sm)+'</td>';
+    rows+='<td class="red">'+fmt(od)+'</td><td class="red">'+fmt(tb)+'</td></tr>';
+  });
+  document.getElementById('d_tbl').innerHTML=rows;
+
+  // ── 위탁 계산 ──
+  var oFixed=rent+cUtil+cOps;
+  document.getElementById('o1_m').textContent='월 '+fmt(Math.round(o1*meals/10000));
+  document.getElementById('o2_m').textContent='월 '+fmt(Math.round(o2*meals/10000));
+  document.getElementById('o3_m').textContent='월 '+fmt(Math.round(o3*meals/10000));
+
+  var oPay1 = Math.round(o1*meals/10000);
+  var oOut1 = oPay1 + oFixed;
+  var oDef1 = Math.max(0, oOut1 - totalIn);
+  var oBurden1 = subM + oDef1;
+  var oIp1 = oBurden1 <= 0;
+
+  document.getElementById('o_in').innerHTML=
+    fi(CI,'직원 납입/월',fmt(empM))+aw()+
+    fi(CS,'회사 식단 보조',fmt(subM))+eq()+
+    fib('식당 총 수입',fmt(totalIn),'#86efac');
+  document.getElementById('o_out').innerHTML=
+    fi(CO,'업체 지급액',fmt(oPay1))+aw()+
+    fi(CO,'수도광열비',fmt(cUtil))+aw()+
+    fi(CO,'위생·운영비',fmt(cOps))+aw()+
+    fi(CO,'임대료',fmt(rent))+eq()+
+    fib('식당 총 지출',fmt(oOut1),'#fca5a5');
+  document.getElementById('o_res').innerHTML=
+    fi(CS,'회사 식단 보조',fmt(subM))+aw()+
+    fi(CO,'운영 적자',fmt(oDef1))+eq()+
+    fib('회사 월 부담',fmt(oBurden1),'#fca5a5','#dc2626');
+
+  document.getElementById('o_em').textContent=fmt(empM);
+  document.getElementById('o_sm').textContent=fmt(subM);
+  var ne=document.getElementById('o_net_v');
+  ne.textContent=fmt(oBurden1);ne.className='mv red';
+  var be=document.getElementById('o_burden'),bye=document.getElementById('o_burden_y');
+  be.textContent=fmt(oBurden1);be.className='mv red';
+  bye.textContent=fmt(oBurden1*12);bye.className='mv red';
+
+  var oBarR=buildOBars(daily,wd,sell,o1,oFixed);
+  document.getElementById('o_bars').innerHTML=oBarR.html;
+  var pm1=sell-o1;
+  document.getElementById('o_bars_note').textContent=pm1>0
+    ?'파란 ◀ = 현재 &nbsp;|&nbsp; 노란 = 손익 0 식수 &nbsp;|&nbsp; 빨간 = 적자 &nbsp;|&nbsp; 초록 = 흑자'
+    :'⛔ 업체단가 ≥ 판매단가 — 식수와 무관하게 매 식마다 손실 발생';
+
+  var orows='';
+  [o1,o2,o3].forEach(function(op){
+    var oP=Math.round(op*meals/10000),oO=oP+oFixed;
+    var oD=Math.max(0,oO-totalIn),oB=subM+oD,pM=sell-op;
+    orows+='<tr><td>'+fmtW(op)+'</td><td class="red">'+fmt(oP)+'</td>';
+    orows+='<td class="'+(pM>0?'green':'red')+'">'+(pM>=0?'+':'')+fmtW(pM)+'</td>';
+    orows+='<td class="red">'+fmt(oB)+'</td>';
+    orows+='<td class="red">'+fmt(oB*12)+'</td></tr>';
+  });
+  document.getElementById('o_tbl').innerHTML=orows;
+
+  // ── 비교 탭 ── (직영·위탁 탭과 동일한 플로우 사용)
+  document.getElementById('c_d_in').innerHTML=
+    fi(CI,'직원 납입',fmt(empM))+aw()+fi(CS,'회사 식단 보조',fmt(subM))+eq()+
+    fib('식당 총 수입',fmt(totalIn),'#86efac');
+  document.getElementById('c_d_out').innerHTML=
+    fi(CO,'인건비',fmt(labor))+aw()+fi(CO,'식재료비',fmt(foodM))+aw()+
+    fi(CO,'수도광열비',fmt(cUtil))+aw()+fi(CO,'위생·운영비',fmt(cOps))+aw()+
+    fi(CO,'임대료',fmt(rent))+eq()+
+    fib('식당 총 지출',fmt(totalOut),'#fca5a5');
+  document.getElementById('c_d_res').innerHTML=
+    fi(CS,'회사 식단 보조',fmt(subM))+aw()+fi(CO,'운영 적자',fmt(dDef))+eq()+
+    fib('회사 총 부담',fmt(dBurden),'#fca5a5','#dc2626');
+  document.getElementById('c_d_b').textContent=fmt(dBurden);
+  document.getElementById('c_d_by').textContent=fmt(dBurden*12);
+
+  document.getElementById('c_o_in').innerHTML=
+    fi(CI,'직원 납입',fmt(empM))+aw()+fi(CS,'회사 식단 보조',fmt(subM))+eq()+
+    fib('식당 총 수입',fmt(totalIn),'#86efac');
+  document.getElementById('c_o_out').innerHTML=
+    fi(CO,'업체 지급액',fmt(oPay1))+aw()+
+    fi(CO,'수도광열비',fmt(cUtil))+aw()+fi(CO,'위생·운영비',fmt(cOps))+aw()+
+    fi(CO,'임대료',fmt(rent))+eq()+
+    fib('식당 총 지출',fmt(oOut1),'#fca5a5');
+  document.getElementById('c_o_res').innerHTML=
+    fi(CS,'회사 식단 보조',fmt(subM))+aw()+fi(CO,'운영 적자',fmt(oDef1))+eq()+
+    fib('회사 총 부담',fmt(oBurden1),'#fca5a5','#dc2626');
+  var cb=document.getElementById('c_o_b'),cby=document.getElementById('c_o_by');
+  cb.textContent=fmt(oBurden1);cb.className='mv red';
+  cby.textContent=fmt(oBurden1*12);cby.className='mv red';
+
+  document.getElementById('cl').textContent=fmt(labor);
+  document.getElementById('cf').textContent=fmt(foodM);
+  document.getElementById('cu').textContent=fmt(cUtil)+' (공통)';
+  document.getElementById('cu_o').textContent=fmt(cUtil)+' (공통)';
+  document.getElementById('co').textContent=fmt(cOps)+' (공통)';
+  document.getElementById('co_o').textContent=fmt(cOps)+' (공통)';
+}
+
+function toggleManual(){
+  var body=document.getElementById('manual-body');
+  var arrow=document.getElementById('manual-arrow');
+  var open=body.classList.toggle('open');
+  arrow.classList.toggle('open',open);
+}
+
+function showTab(n){
+  ['d','o','c'].forEach(function(t){document.getElementById('tab-'+t).style.display=t===n?'':'none';});
+  document.querySelectorAll('.tab').forEach(function(b,i){b.classList.toggle('active',['d','o','c'][i]===n);});
+}
+
+document.getElementById('d_food_rate').addEventListener('input',function(){
+  var s=v('sell'),r=v('d_food_rate');
+  document.getElementById('d_food').value=Math.round(s*r/100);
+  calc();
+});
+document.getElementById('d_food').addEventListener('input',function(){
+  var s=v('sell'),f=v('d_food');
+  if(s>0)document.getElementById('d_food_rate').value=Math.round(f/s*100);
+  calc();
+});
+document.querySelectorAll('input').forEach(function(el){
+  if(el.id!=='d_food_rate'&&el.id!=='d_food')el.addEventListener('input',calc);
+});
+calc();
+</script>
+</body>
+</html>
